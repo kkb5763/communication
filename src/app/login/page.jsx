@@ -65,7 +65,9 @@ export default function LoginPage() {
       };
       
       try {
-        localStorage.setItem('user', JSON.stringify(userData));
+        const storageKey = `user_${window.location.hostname}`;
+        localStorage.setItem(storageKey, JSON.stringify(userData));
+        localStorage.setItem('user', JSON.stringify(userData)); // 이전 버전 호환
       } catch (error) {
         console.error('Error saving user data to localStorage:', error);
       }
