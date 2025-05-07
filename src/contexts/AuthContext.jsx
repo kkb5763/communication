@@ -43,7 +43,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signOut = () => {
-    localStorage.removeItem('user');
+    try {
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.error('Error removing user data:', error);
+    }
     setUser(null);
     router.push('/login');
   };

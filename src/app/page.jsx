@@ -54,7 +54,6 @@ export default function Home() {
   }, [selectedCategory]);
 
   if (authLoading) return null;
-  if (!user) return <div className="container mx-auto px-4 py-8 text-center">로그인 후 이용 가능합니다.</div>;
 
   return (
     <div className="min-h-screen bg-background">

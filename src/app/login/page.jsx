@@ -29,7 +29,7 @@ export default function LoginPage() {
     setError('');
 
     const form = e.target;
-    const email = form.email.value;
+    const email = form.email.value; 
     const password = form.password.value;
 
     try {
@@ -64,7 +64,11 @@ export default function LoginPage() {
         loggedInAt: new Date().toISOString()
       };
       
-      localStorage.setItem('user', JSON.stringify(userData));
+      try {
+        localStorage.setItem('user', JSON.stringify(userData));
+      } catch (error) {
+        console.error('Error saving user data to localStorage:', error);
+      }
 
       // 로그인 성공 시 홈으로 이동
       router.push('/');
