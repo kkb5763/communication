@@ -99,6 +99,26 @@ export default function PostDetailPage({ params }) {
     }
   };
 
+  // 삭제 핸들러: 게시글과 연결된 댓글도 함께 삭제
+  const handleDelete = async () => {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+    // 댓글 먼저 삭제
+    await supabase.from('tb_comments').delete().eq('post_id', post.id);
+    // 게시글 삭제
+    const { error } = await supabase.from('tb_posts').delete().eq('id', post.id);
+    if (!error) {
+      alert("삭제되었습니다.");
+      router.push('/');
+    } else {
+      alert("삭제 실패: " + error.message);
+    }
+  };
+
+  // 수정 핸들러: 수정 페이지로 이동 (예시)
+  const handleEdit = () => {
+    router.push(`/posts/${post.id}/edit`);
+  };
+
   if (authLoading) return null;
   if (!user) return <div className="container mx-auto px-4 py-8 text-center">로그인 후 이용 가능합니다.</div>;
   if (loading) return <div className="container mx-auto px-4 py-8">로딩중...</div>;
@@ -113,7 +133,7 @@ export default function PostDetailPage({ params }) {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                <Button variant="ghost" size="icon" onClick={() => router.push('/')}>
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <h1 className="text-2xl font-bold mt-1">{post.title}</h1>
@@ -130,14 +150,19 @@ export default function PostDetailPage({ params }) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Edit className="h-4 w-4 mr-2" />
-                      수정
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      삭제
-                    </DropdownMenuItem>
+                    {/* 작성자만 수정/삭제 가능 */}
+                    {user.id === post.user_id && (
+                      <>
+                        <DropdownMenuItem onClick={handleEdit}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          수정
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={handleDelete}>
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          삭제
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

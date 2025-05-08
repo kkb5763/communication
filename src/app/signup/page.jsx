@@ -42,8 +42,8 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-md mx-auto">
+    <div className="container mx-auto px-2 py-4 sm:px-4 sm:py-8">
+      <div className="w-full max-w-md mx-auto">
         <Card className="bg-background border border-border shadow-lg">
           <CardHeader>
             <CardTitle>회원가입</CardTitle>
@@ -61,7 +61,7 @@ export default function SignUpPage() {
                   type="email"
                   placeholder="이메일을 입력하세요"
                   required
-                  className="bg-background border border-border"
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
@@ -72,7 +72,7 @@ export default function SignUpPage() {
                   type="password"
                   placeholder="비밀번호를 입력하세요"
                   required
-                  className="bg-background border border-border"
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
@@ -83,7 +83,7 @@ export default function SignUpPage() {
                   type="password"
                   placeholder="비밀번호를 다시 입력하세요"
                   required
-                  className="bg-background border border-border"
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
@@ -93,7 +93,7 @@ export default function SignUpPage() {
                   name="nickname"
                   placeholder="닉네임을 입력하세요"
                   required
-                  className="bg-background border border-border"
+                  className="w-full"
                 />
               </div>
               <div className="flex items-center gap-2">

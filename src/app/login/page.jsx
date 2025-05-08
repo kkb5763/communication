@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, setUser } = useAuth();
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -61,6 +61,7 @@ export default function LoginPage() {
         email: users.email,
         nickname: users.nickname,
         profile_image_url: users.profile_image_url,
+        auth: users.auth,
         loggedInAt: new Date().toISOString()
       };
       
@@ -68,6 +69,7 @@ export default function LoginPage() {
         const storageKey = `user_${window.location.hostname}`;
         localStorage.setItem(storageKey, JSON.stringify(userData));
         localStorage.setItem('user', JSON.stringify(userData)); // 이전 버전 호환
+        setUser(userData); // 컨텍스트 상태도 즉시 반영
       } catch (error) {
         console.error('Error saving user data to localStorage:', error);
       }
@@ -82,8 +84,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-md mx-auto">
+    <div className="container mx-auto px-2 py-4 sm:px-4 sm:py-8">
+      <div className="w-full max-w-md mx-auto">
         <Card>
           <CardHeader>
             <CardTitle>로그인</CardTitle>
@@ -101,6 +103,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="이메일을 입력하세요"
                   required
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
@@ -111,6 +114,7 @@ export default function LoginPage() {
                   type="password"
                   placeholder="비밀번호를 입력하세요"
                   required
+                  className="w-full"
                 />
               </div>
               {error && <div className="text-red-500 text-sm">{error}</div>}

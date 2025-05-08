@@ -8,8 +8,8 @@ import Header from "@/components/Header";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Blind Community",
-  description: "익명 커뮤니티 플랫폼",
+  title: "Community",
+  description: "커뮤니티",
 };
 
 export default function RootLayout({ children }) {
