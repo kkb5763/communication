@@ -16,6 +16,8 @@ export default function AdminCommunityPage() {
   const [catLoading, setCatLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [userLoading, setUserLoading] = useState(false);
+  const [newCategoryCode, setNewCategoryCode] = useState(""); 
+  const [newCategoryName, setNewCategoryName] = useState(""); 
 
   // 관리자만 접근 가능
   useEffect(() => {
@@ -49,18 +51,62 @@ export default function AdminCommunityPage() {
 
   // 카테고리 추가
   const handleAddCategory = async () => {
-    if (!newCategory.trim()) return;
-    await supabase.from("tb_codes").insert({ category: 1, name: newCategory, code: Date.now().toString() });
-    setNewCategory("");
+    if (!newCategoryName.trim() || !newCategoryCode.trim()) return;
+
+    const parsedCode = parseInt(newCategoryCode, 10);
+    if (isNaN(parsedCode)) {
+      alert("코드 값은 숫자여야 합니다.");
+      return;
+    }
+
+    // 중복 코드 확인
+    const { data: existing, error: checkError } = await supabase
+      .from("tb_codes")
+      .select("id")
+      .eq("code", parsedCode)
+      .eq("category", 1)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("중복 확인 중 오류:", checkError.message);
+      alert("오류가 발생했습니다.");
+      return;
+    }
+
+    if (existing) {
+      alert("이미 사용 중인 코드값입니다.");
+      return;
+    }
+
+    // 삽입
+    const { error } = await supabase.from("tb_codes").insert({
+      category: 1,
+      name: newCategoryName,
+      code: parsedCode,
+    });
+
+    if (error) {
+      alert("추가 중 오류가 발생했습니다.");
+      return;
+    }
+
+    setNewCategoryName("");
+    setNewCategoryCode("");
+
     // 새로고침
-    const { data } = await supabase.from("tb_codes").select("*").eq("category", 1).order("id", { ascending: true });
+    const { data } = await supabase
+      .from("tb_codes")
+      .select("*")
+      .eq("category", 1)
+      .order("id", { ascending: true });
+
     setCategories(data || []);
   };
 
   // 카테고리 삭제
-  const handleDeleteCategory = async (id) => {
+  const handleDeleteCategory = async (code) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
-    await supabase.from("tb_codes").delete().eq("id", id);
+    await supabase.from("tb_codes").delete().eq("code", code);
     const { data } = await supabase.from("tb_codes").select("*").eq("category", 1).order("id", { ascending: true });
     setCategories(data || []);
   };
@@ -92,19 +138,31 @@ export default function AdminCommunityPage() {
           </CardHeader>
           <CardContent>
             <div className="flex gap-2 mb-4">
-              <Input
-                value={newCategory}
-                onChange={e => setNewCategory(e.target.value)}
-                placeholder="새 카테고리명 입력"
-                className="w-64"
-              />
-              <Button onClick={handleAddCategory} disabled={catLoading || !newCategory.trim()}>추가</Button>
+            <Input
+              value={newCategoryCode}
+              onChange={(e) => setNewCategoryCode(e.target.value)}
+              placeholder="카테고리 코드 (숫자)"
+              className="w-32"
+            />
+            <Input
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="카테고리명"
+              className="w-64"
+            />
+            <Button
+              onClick={handleAddCategory}
+              disabled={catLoading || !newCategoryCode.trim() || !newCategoryName.trim()}
+            >
+              추가
+            </Button>
+
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border">
                 <thead>
                   <tr className="bg-muted">
-                    <th className="p-2 border">ID</th>
+                    <th className="p-2 border">코드</th>
                     <th className="p-2 border">이름</th>
                     <th className="p-2 border">삭제</th>
                   </tr>
@@ -112,10 +170,10 @@ export default function AdminCommunityPage() {
                 <tbody>
                   {categories.map(cat => (
                     <tr key={cat.id}>
-                      <td className="p-2 border">{cat.id}</td>
+                      <td className="p-2 border">{cat.code}</td>
                       <td className="p-2 border">{cat.name}</td>
                       <td className="p-2 border">
-                        <Button size="sm" variant="destructive" onClick={() => handleDeleteCategory(cat.id)}>삭제</Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleDeleteCategory(cat.code)}>삭제</Button>
                       </td>
                     </tr>
                   ))}
