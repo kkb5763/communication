@@ -27,7 +27,7 @@ export default function PostListPage() {
     const fetchPosts = async () => {
       setLoading(true);
       setError("");
-      let query = supabase.from("tb_posts").select("*").order("created_at", { ascending: false });
+      let query = supabase.from("tb_posts").select("*").eq("is_hidden", false).order("created_at", { ascending: false });
       if (selectedCategory) {
         query = query.eq("category", selectedCategory);
       }

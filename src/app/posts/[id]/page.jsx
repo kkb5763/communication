@@ -46,7 +46,7 @@ export default function PostDetailPage({ params }) {
         if (data && data.user_id) {
           const { data: userData } = await supabase
             .from("tb_users")
-            .select("nickname")
+            .select("*")
             .eq("id", data.user_id)
             .single();
           setNickname(userData?.nickname || '[unknown]');
@@ -103,9 +103,10 @@ export default function PostDetailPage({ params }) {
   const handleDelete = async () => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
     // 댓글 먼저 삭제
-    await supabase.from('tb_comments').delete().eq('post_id', post.id);
+    //await supabase.from('tb_comments').delete().eq('post_id', post.id);
     // 게시글 삭제
-    const { error } = await supabase.from('tb_posts').delete().eq('id', post.id);
+    //const { error } = await supabase.from('tb_posts').delete().eq('id', post.id);
+    const { error } = await supabase.from('tb_posts').update({is_hidden: true}).eq('id', post.id);
     if (!error) {
       alert("삭제되었습니다.");
       router.push('/');
@@ -149,9 +150,9 @@ export default function PostDetailPage({ params }) {
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="shadow-lg border p-2 rounded">
                     {/* 작성자만 수정/삭제 가능 */}
-                    {user.id === post.user_id && (
+                    {(user.id === post.user_id || user.auth === '01') && (
                       <>
                         <DropdownMenuItem onClick={handleEdit}>
                           <Edit className="h-4 w-4 mr-2" />
