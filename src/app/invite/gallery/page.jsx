@@ -41,8 +41,27 @@ export default function GalleryPage() {
 
   // 이미지 업로드 처리
   const handleUpload = async (event) => {
-    const file = event.target.files[0];
+    let file = event.target.files[0];
     if (!file) return;
+
+    // 이미지 크기 압축 (3MB 이하로)
+    if (file.size > 3 * 1024 * 1024) {
+      const imageBitmap = await createImageBitmap(file);
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 1920;
+      const scale = MAX_WIDTH / imageBitmap.width;
+      canvas.width = MAX_WIDTH;
+      canvas.height = imageBitmap.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
+
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.5));
+      if (!blob) {
+        showToast('이미지 압축 실패');
+        return;
+      }
+      file = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), { type: 'image/jpeg' });
+    }
 
     const fileExt = file.name.split('.').pop();
     const fileName = `gallery/${Date.now()}.${fileExt}`;
