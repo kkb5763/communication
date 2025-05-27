@@ -19,8 +19,6 @@ export default function InvitePage() {
     `/images/wedding-1.png`,
     `/images/wedding-2.png`,
     `/images/wedding-3.png`,
-    `/images/wedding-4.png`,
-    `/images/wedding-5.png`,
   ];
 
   const nextSlide = () => setCurrent((current + 1) % images.length);
